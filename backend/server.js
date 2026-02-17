@@ -50,11 +50,20 @@ server.on('error', (err) => {
 
 // Attempt MongoDB connection but do not prevent the server from starting.
 // Connect to MongoDB (non-blocking for dev).
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/homecare';
-mongoose.connect(mongoUri)
-  .then(() => {
-    console.log('MongoDB connected');
-  })
-  .catch(err => {
-    console.error('MongoDB connection error (server is still running):', err.message || err);
-  });
+let mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/homecare';
+// sanitize: trim and remove UTF-8 BOM if present
+if (typeof mongoUri === 'string') {
+  mongoUri = mongoUri.trim().replace(/^\uFEFF/, '');
+}
+// validate scheme before attempting connection
+if (!/^mongodb(\+srv)?:\/\//i.test(mongoUri)) {
+  console.error('MongoDB connection error: invalid URI scheme. Skipping connection.');
+} else {
+  mongoose.connect(mongoUri)
+    .then(() => {
+      console.log('MongoDB connected');
+    })
+    .catch(err => {
+      console.error('MongoDB connection error (server is still running):', err.message || err);
+    });
+}
