@@ -165,28 +165,28 @@ const Home = () => {
                           setQuickSuccess(false);
                         } else {
                           const res = await fetch(`${API_BASE}/api/request-service`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(payload),
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload),
                           });
-                        }
-                        const json = await res.json().catch(() => ({}));
-                        if (res.ok) {
-                          // prefer server-reported emailSent when available
-                          if (json.emailSent === true) {
-                            setQuickStatus('Request received — we will call you shortly.');
-                            setQuickSuccess(true);
-                          } else if (json.emailSent === false) {
-                            setQuickStatus('Request received but email notification failed.');
-                            setQuickSuccess(false);
+                          const json = await res.json().catch(() => ({}));
+                          if (res.ok) {
+                            // prefer server-reported emailSent when available
+                            if (json.emailSent === true) {
+                              setQuickStatus('Request received — we will call you shortly.');
+                              setQuickSuccess(true);
+                            } else if (json.emailSent === false) {
+                              setQuickStatus('Request received but email notification failed.');
+                              setQuickSuccess(false);
+                            } else {
+                              setQuickStatus('Request received.');
+                              setQuickSuccess(true);
+                            }
+                            setFormData({ ...formData, fullName: '', phoneNumber: '', email: '' });
                           } else {
-                            setQuickStatus('Request received.');
-                            setQuickSuccess(true);
+                            setQuickStatus((json && json.message) || 'Failed to send request. Please try again.');
+                            setQuickSuccess(false);
                           }
-                          setFormData({ ...formData, fullName: '', phoneNumber: '', email: '' });
-                        } else {
-                          setQuickStatus((json && json.message) || 'Failed to send request. Please try again.');
-                          setQuickSuccess(false);
                         }
                       } catch (err) {
                         setQuickStatus('Error sending request. Please try again.');
