@@ -18,20 +18,22 @@ function App() {
     <>
       <ScrollToTop />
       <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="services" element={<Services />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="services/home-nursing" element={<HomeNursing />} />
-        <Route path="services/injection-services" element={<InjectionServices />} />
-        <Route path="services/elderly-care" element={<ElderlyCare />} />
-        <Route path="services/physiotherapy" element={<Physiotherapy />} />
-        <Route path="services/patient-sampling" element={<PatientSampling />} />
-        <Route path="services/health-checkups" element={<HealthCheckups />} />
-        <Route path="admin" element={<Admin />} />
-      </Route>
-    </Routes>
+        {/* Public site routes use Layout */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="services" element={<Services />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="services/home-nursing" element={<HomeNursing />} />
+          <Route path="services/injection-services" element={<InjectionServices />} />
+          <Route path="services/elderly-care" element={<ElderlyCare />} />
+          <Route path="services/physiotherapy" element={<Physiotherapy />} />
+          <Route path="services/patient-sampling" element={<PatientSampling />} />
+          <Route path="services/health-checkups" element={<HealthCheckups />} />
+        </Route>
+        {/* Admin panel route does NOT use Layout (no navbar/header/footer) */}
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
     </>
   );
 }
