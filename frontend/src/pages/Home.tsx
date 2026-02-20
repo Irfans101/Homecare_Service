@@ -164,18 +164,24 @@ const Home = () => {
                           setQuickStatus('Server not configured. Contact the site administrator.');
                           setQuickSuccess(false);
                         } else {
-                          const res = await fetch(`${API_BASE}/api/request-service`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload),
-                          });
-                          const json = await res.json().catch(() => ({}));
-                          if (res.ok) {
-                            // prefer server-reported emailSent when available
-                            if (json.emailSent === true) {
+                          let res, json;
+                          try {
+                            res = await fetch(`${API_BASE}/api/request-service`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify(payload),
+                            });
+                            json = await res.json().catch(() => ({}));
+                          } catch (err) {
+                            setQuickStatus('Network error. Please try again.');
+                            setQuickSuccess(false);
+                            return;
+                          }
+                          if (res && res.ok) {
+                            if (json && json.emailSent === true) {
                               setQuickStatus('Request received — we will call you shortly.');
                               setQuickSuccess(true);
-                            } else if (json.emailSent === false) {
+                            } else if (json && json.emailSent === false) {
                               setQuickStatus('Request received but email notification failed.');
                               setQuickSuccess(false);
                             } else {
@@ -183,8 +189,11 @@ const Home = () => {
                               setQuickSuccess(true);
                             }
                             setFormData({ ...formData, fullName: '', phoneNumber: '', email: '' });
+                          } else if (json && json.message) {
+                            setQuickStatus(json.message);
+                            setQuickSuccess(false);
                           } else {
-                            setQuickStatus((json && json.message) || 'Failed to send request. Please try again.');
+                            setQuickStatus('Failed to send request. Please try again.');
                             setQuickSuccess(false);
                           }
                         }
